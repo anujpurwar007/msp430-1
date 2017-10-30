@@ -1,0 +1,35 @@
+#include <msp430.h> 
+
+/*
+ * main.c
+ */
+int main(void) {
+    WDTCTL = WDTPW | WDTHOLD;	// Stop watchdog timer
+    __enable_interrupt();       //enabling global interrupt
+    P1DIR|=0x41;
+    P1OUT|=0x01;
+    P1OUT&=~0x40;
+    //P1OUT&=~BIT0;
+    //P1OUT|=BIT6;
+    P1DIR&=~BIT3;
+    P1REN|=0x08;
+    P1OUT|=0x08;
+    //__delay_interrupt();
+    //#pragma vector = Port1_vector;
+    //__interrupt void port_1(void)
+    P1IE|=0x08;
+    P1IES&=~BIT3;
+
+
+
+	return 0;
+}
+//ISR
+#pragma vector = PORT1_VECTOR               //TO TELL THE ADDRESS OF THE PERIPHERAL FROM WHICH INTERRUPT HAS COME
+__interrupt void port1(void)                //JUMP TO THE ISR
+{
+    P1OUT^=0x41;
+    __delay_cycles(200000);
+     P1IFG&=0xF7;                           //DISABLES THE GIE PIN TO 0 TO AVOID MASKABLE INTERRUPTS
+     //WHEN THE INTERRUPT COMES THE FLAG IS SET TO 1 NOW TO CLEAR THE FLAG WE SET IT TO ZERO BY THE PREVIOUS COMMAND
+}
